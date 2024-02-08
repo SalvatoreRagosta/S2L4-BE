@@ -1,0 +1,116 @@
+
+CREATE DATABASE AziendaDB;
+GO
+
+
+USE AziendaDB;
+GO
+
+
+CREATE TABLE IMPIEGATO (
+    IDImpiegato INT PRIMARY KEY,
+    Cognome NVARCHAR(50),
+    Nome NVARCHAR(50),
+    Data_Assunzione DATETIME,
+    Codice_Fiscale NVARCHAR(20),
+    Eta INT,
+    Reddito_Mensile DECIMAL(10, 2),
+    Detrazione_Fiscale BIT
+);
+GO
+
+
+CREATE TABLE IMPIEGO (
+    IDImpiego INT PRIMARY KEY,
+    Tipo_Impiego NVARCHAR(50)
+);
+GO
+
+
+ALTER TABLE IMPIEGATO
+ADD CONSTRAINT FK_Impiegato_Impiego FOREIGN KEY (IDImpiego) REFERENCES IMPIEGO(IDImpiego);
+GO
+
+
+SELECT * FROM IMPIEGATO WHERE Eta > 29;
+
+
+SELECT * FROM IMPIEGATO WHERE Reddito_Mensile >= 800;
+
+
+SELECT * FROM IMPIEGATO WHERE Detrazione_Fiscale = 1;
+
+SELECT * FROM IMPIEGATO WHERE Detrazione_Fiscale = 0;
+
+
+SELECT * FROM IMPIEGATO WHERE Cognome LIKE 'G%' ORDER BY Cognome;
+
+
+SELECT COUNT(*) AS NumeroImpiegati FROM IMPIEGATO;
+
+
+SELECT SUM(Reddito_Mensile) AS TotaleRedditi FROM IMPIEGATO;
+
+
+SELECT AVG(Reddito_Mensile) AS MediaRedditi FROM IMPIEGATO;
+
+
+SELECT MAX(Reddito_Mensile) AS RedditoMassimo FROM IMPIEGATO;
+
+
+SELECT MIN(Reddito_Mensile) AS RedditoMinimo FROM IMPIEGATO;
+
+
+SELECT * FROM IMPIEGATO WHERE Data_Assunzione BETWEEN '2007-01-01' AND '2008-01-01';
+
+
+CREATE PROCEDURE VisualizzaImpiegatiPerTipoImpiego @TipoImpiego NVARCHAR(50)
+AS
+BEGIN
+    SELECT * FROM IMPIEGATO WHERE IDImpiego = (SELECT IDImpiego FROM IMPIEGO WHERE Tipo_Impiego = @TipoImpiego);
+END;
+
+
+SELECT AVG(Eta) AS MediaEta FROM IMPIEGATO;
+
+
+CREATE PROCEDURE MemorizzaNuovoImpiegato
+    @Cognome NVARCHAR(50),
+    @Nome NVARCHAR(50),
+    @Data_Assunzione DATETIME,
+    @Codice_Fiscale NVARCHAR(20),
+    @Eta INT,
+    @Reddito_Mensile DECIMAL(10, 2),
+    @Detrazione_Fiscale BIT
+AS
+BEGIN
+    INSERT INTO IMPIEGATO (Cognome, Nome, Data_Assunzione, Codice_Fiscale, Eta, Reddito_Mensile, Detrazione_Fiscale)
+    VALUES (@Cognome, @Nome, @Data_Assunzione, @Codice_Fiscale, @Eta, @Reddito_Mensile, @Detrazione_Fiscale);
+END;
+
+
+CREATE PROCEDURE AggiornaImpiegato
+    @IDImpiegato INT,
+    @Cognome NVARCHAR(50),
+    @Nome NVARCHAR(50),
+    @Data_Assunzione DATETIME,
+    @Codice_Fiscale NVARCHAR(20),
+    @Eta INT,
+    @Reddito_Mensile DECIMAL(10, 2),
+    @Detrazione_Fiscale BIT
+AS
+BEGIN
+    UPDATE IMPIEGATO
+    SET Cognome = @Cognome, Nome = @Nome, Data_Assunzione = @Data_Assunzione, Codice_Fiscale = @Codice_Fiscale,
+        Eta = @Eta, Reddito_Mensile = @Reddito_Mensile, Detrazione_Fiscale = @Detrazione_Fiscale
+    WHERE IDImpiegato = @IDImpiegato;
+END;
+
+
+CREATE PROCEDURE EliminaImpiegato
+    @IDImpiegato INT
+AS
+BEGIN
+    DELETE FROM IMPIEGATO WHERE IDImpiegato = @IDImpiegato;
+END;
+
